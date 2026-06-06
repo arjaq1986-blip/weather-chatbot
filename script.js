@@ -1,9 +1,9 @@
 // ===========================
 // CONFIGURATION
 // ===========================
-const OPENWEATHER_API_KEY = 'YOUR_API_KEY_HERE';
 const API_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const LOCALSTORAGE_KEY = 'weatherChatHistory';
+const LOCALSTORAGE_API_KEY = 'weatherApiKey';
 const MAX_HISTORY = 20;
 
 // ===========================
@@ -21,6 +21,82 @@ const recommendationText = document.getElementById('recommendationText');
 const quickButtons = document.querySelectorAll('.quick-btn');
 const historyList = document.getElementById('historyList');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+// ===========================
+// API KEY PANEL
+// ===========================
+function createApiKeyPanel() {
+    const overlay = document.createElement('div');
+    overlay.id = 'apiKeyOverlay';
+    overlay.style.cssText = `
+        position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999; font-family: inherit;
+    `;
+
+    overlay.innerHTML = `
+        <div style="
+            background: #fff; border-radius: 12px; padding: 2rem;
+            width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        ">
+            <h2 style="margin:0 0 0.5rem">🌤️ Połącz swoje konto OpenWeatherMap</h2>
+            <p style="color:#555; font-size:0.9rem; margin:0 0 1.25rem">
+                Wpisz swój osobisty klucz API z
+                <a href="https://home.openweathermap.org/api_keys" target="_blank" rel="noopener">
+                    openweathermap.org
+                </a>.
+                Zostanie zapisany lokalnie w przeglądarce i nigdzie nie będzie wysyłany.
+            </p>
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem">
+                Klucz API
+            </label>
+            <input
+                id="apiKeyInput"
+                type="password"
+                placeholder="Wklej swój klucz API tutaj…"
+                autocomplete="off"
+                style="
+                    width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem;
+                    border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;
+                    margin-bottom: 0.5rem;
+                "
+            />
+            <div id="apiKeyError" style="color:#c0392b; font-size:0.82rem; min-height:1.1rem; margin-bottom:0.75rem;"></div>
+            <div style="display:flex; gap:0.75rem;">
+                <button id="apiKeySaveBtn" style="
+                    flex:1; padding:0.65rem; background: linear-gradient(135deg, #6366f1, #ec4899);
+                    color:#fff; border:none; border-radius:8px; font-size:1rem; cursor:pointer;
+                ">Zapisz i połącz</button>
+                <button id="apiKeySkipBtn" style="
+                    flex:1; padding:0.65rem; background:#f0f0f0; color:#333;
+                    border:none; border-radius:8px; font-size:1rem; cursor:pointer;
+                ">Użyj bez API</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById('apiKeySaveBtn').addEventListener('click', () => {
+        const key = document.getElementById('apiKeyInput').value.trim();
+        if (!key) {
+            document.getElementById('apiKeyError').textContent = 'Proszę wpisać prawidłowy klucz API.';
+            return;
+        }
+        localStorage.setItem(LOCALSTORAGE_API_KEY, key);
+        overlay.remove();
+        addBotMessage('✅ Klucz API zapisany! Możesz teraz wyszukiwać pogodę po nazwie miasta.');
+    });
+
+    document.getElementById('apiKeySkipBtn').addEventListener('click', () => {
+        overlay.remove();
+        addBotMessage('ℹ️ Działa bez klucza API — opisz pogodę słowami (np. "15 stopni i pada deszcz"), a doradzę strój!');
+    });
+}
+
+function getApiKey() {
+    return localStorage.getItem(LOCALSTORAGE_API_KEY) || null;
+}
 
 // ===========================
 // NATURAL LANGUAGE PARSING
@@ -41,7 +117,6 @@ const weatherPatterns = {
 // CLOTHING & STYLE DATA
 // ===========================
 const clothingRecommendations = {
-    // Temperature-based
     veryHot: {
         temp: 30,
         clothing: ['Lekki T-shirt', 'Krótkie szorty', 'Sandały'],
@@ -82,8 +157,6 @@ const clothingRecommendations = {
         style: ['Ciepłe', 'Eleganckie', 'Wygodne'],
         fullAdvice: 'Jest bardzo zimno! Załóż kilka warstw ciepłych ubrań. Obowiązkowe: płaszcz zimowy, czapka, szalik i rękawiczki. Pamiętaj o ochronie skóry twarzy i ust.'
     },
-
-    // Condition-based additions
     rainy: {
         clothing: ['Płaszcz przeciwdeszczowy', 'Wodoodporne buty', 'Spodnie jeans'],
         accessories: ['Parasol', 'Wodoodporny plecak'],
@@ -93,7 +166,7 @@ const clothingRecommendations = {
     },
     snowy: {
         clothing: ['Płaszcz zimowy', 'Termiczne legginsy', 'Buty zimowe'],
-        accessories: ['Czapka', 'Szalik', 'Rękawiczki', 'Szalik'],
+        accessories: ['Czapka', 'Szalik', 'Rękawiczki'],
         protection: ['Krem na zmęczenie skóry', 'Balsam do ust'],
         style: ['Ciepłe', 'Eleganckie', 'Przewiewne'],
         advice: 'Pada śnieg! Ubierz się bardzo ciepło. Niezwykle ważne są rękawiczki, czapka i szalik. Buty zimowe z dobrym uchwytem będą niezbędne dla bezpieczeństwa.'
@@ -127,11 +200,18 @@ const clothingRecommendations = {
 document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
     loadChatHistory();
+
+    // Show API key panel on first visit (no key stored yet)
+    if (!getApiKey()) {
+        createApiKeyPanel();
+    }
+
     addBotMessage('Cześć! 👋 Jestem twoim asystentem modowego stylu. Opowiedz mi o pogodzie (np. "Jest 15 stopni i pada deszcz") a dam ci idealne rekomendacje na ubiór, dodatki i styl!');
 });
 
 function initializeEventListeners() {
     inputForm.addEventListener('submit', handleUserInput);
+
     quickButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const city = e.target.dataset.city;
@@ -139,7 +219,14 @@ function initializeEventListeners() {
             handleWeatherRequest(city);
         });
     });
+
     clearHistoryBtn.addEventListener('click', clearHistory);
+
+    // Optional: wire up a "Change API key" button if you add one in index.html
+    const changeKeyBtn = document.getElementById('changeApiKeyBtn');
+    if (changeKeyBtn) {
+        changeKeyBtn.addEventListener('click', createApiKeyPanel);
+    }
 }
 
 // ===========================
@@ -179,7 +266,6 @@ function generateRecommendations(weatherData) {
         advice: ''
     };
 
-    // Determine base recommendation by temperature
     let baseRec = clothingRecommendations.mild;
 
     if (weatherData.temperature !== null) {
@@ -196,14 +282,12 @@ function generateRecommendations(weatherData) {
         }
     }
 
-    // Start with base recommendations
     recommendations.clothing = [...baseRec.clothing];
     recommendations.accessories = [...baseRec.accessories];
     recommendations.protection = [...baseRec.protection];
     recommendations.style = [...baseRec.style];
     recommendations.advice = baseRec.fullAdvice;
 
-    // Add condition-specific recommendations
     if (weatherData.hasRain) {
         recommendations.clothing.push(...clothingRecommendations.rainy.clothing);
         recommendations.accessories.push(...clothingRecommendations.rainy.accessories);
@@ -226,7 +310,6 @@ function generateRecommendations(weatherData) {
         recommendations.protection.push(...clothingRecommendations.sunny.protection);
     }
 
-    // Remove duplicates
     recommendations.clothing = [...new Set(recommendations.clothing)];
     recommendations.accessories = [...new Set(recommendations.accessories)];
     recommendations.protection = [...new Set(recommendations.protection)];
@@ -247,14 +330,11 @@ function handleUserInput(e) {
     userInput.value = '';
     userInput.focus();
 
-    // Parse natural language input
     const weatherData = parseWeatherInput(input);
 
     if (weatherData.temperature === null && !weatherData.hasRain && !weatherData.hasSnow) {
-        // Try to fetch from API if it looks like a city name
         handleWeatherRequest(input);
     } else {
-        // Process as weather description
         processWeatherDescription(weatherData);
     }
 }
@@ -273,33 +353,37 @@ function handleWeatherRequest(city) {
 // WEATHER API
 // ===========================
 async function fetchWeatherData(city) {
-    try {
-        if (OPENWEATHER_API_KEY === 'YOUR_API_KEY_HERE') {
-            // If no API key, treat as weather description
-            const weatherData = parseWeatherInput(city);
-            hideLoading();
-            processWeatherDescription(weatherData);
-            return;
-        }
+    const apiKey = getApiKey();
 
+    if (!apiKey) {
+        hideLoading();
+        addBotMessage('🔑 Nie masz jeszcze klucza API. Zaloguj się, aby wyszukiwać pogodę po nazwie miasta.');
+        createApiKeyPanel();
+        return;
+    }
+
+    try {
         const response = await fetch(
-            `${API_BASE_URL}?q=${encodeURIComponent(city)}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=pl`
+            `${API_BASE_URL}?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=pl`
         );
 
+        hideLoading();
+
         if (!response.ok) {
-            hideLoading();
-            const weatherData = parseWeatherInput(city);
-            processWeatherDescription(weatherData);
+            if (response.status === 401) {
+                addBotMessage('❌ Nieprawidłowy klucz API. Sprawdź go i spróbuj ponownie.');
+                createApiKeyPanel();
+            } else {
+                addBotMessage(`⚠️ Nie znaleziono miasta "${city}". Spróbuj opisać pogodę słowami.`);
+            }
             return;
         }
 
         const data = await response.json();
-        hideLoading();
         processAPIWeatherData(data);
     } catch (error) {
         hideLoading();
-        const weatherData = parseWeatherInput(city);
-        processWeatherDescription(weatherData);
+        addBotMessage('⚠️ Błąd połączenia. Sprawdź internet lub opisz pogodę ręcznie.');
     }
 }
 
@@ -333,31 +417,25 @@ function processWeatherDescription(weatherData) {
 // DISPLAY FUNCTIONS
 // ===========================
 function displayRecommendations(recommendations, weatherData) {
-    // Clear previous recommendations
     clothingItems.innerHTML = '';
 
-    // Build comprehensive recommendation text
     let fullRecommendation = `💡 **Moje rekomendacje na ubiór:**\n\n`;
 
     if (recommendations.clothing.length > 0) {
         fullRecommendation += `👕 **Ubranie:**\n${recommendations.clothing.map(item => `• ${item}`).join('\n')}\n\n`;
     }
-
     if (recommendations.accessories.length > 0) {
         fullRecommendation += `✨ **Dodatki:**\n${recommendations.accessories.map(item => `• ${item}`).join('\n')}\n\n`;
     }
-
     if (recommendations.protection.length > 0) {
         fullRecommendation += `🛡️ **Ochrona:**\n${recommendations.protection.map(item => `• ${item}`).join('\n')}\n\n`;
     }
-
     if (recommendations.style.length > 0) {
         fullRecommendation += `🎨 **Styl:**\n${recommendations.style.map(item => `• ${item}`).join('\n')}\n\n`;
     }
 
     fullRecommendation += `\n📝 ${recommendations.advice}`;
 
-    // Display recommendation cards
     recommendations.clothing.forEach((item) => {
         const div = document.createElement('div');
         div.className = 'clothing-item';
@@ -388,8 +466,7 @@ function addUserMessage(message) {
 function addBotMessage(message) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message bot-message';
-    
-    // Convert markdown-like formatting to HTML
+
     let htmlMessage = escapeHtml(message);
     htmlMessage = htmlMessage
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -462,7 +539,7 @@ function loadChatHistory() {
     history.forEach((item) => {
         const div = document.createElement('div');
         div.className = 'history-item';
-        
+
         if (item.city) {
             div.innerHTML = `
                 <strong>${item.city}</strong>
@@ -485,7 +562,7 @@ function loadChatHistory() {
                 processWeatherDescription(weatherData);
             });
         }
-        
+
         historyList.appendChild(div);
     });
 }
