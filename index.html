@@ -3,33 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inteligentny asystent stylu — rekomendacje ubioru dopasowane do aktualnej pogody.">
     <title>Bot Doradzający Ubiór do Pogody</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
+
         <!-- Header -->
         <header class="header">
             <div class="header-content">
                 <h1><i class="fas fa-cloud-sun"></i> Asystent Stylu Pogodowego</h1>
                 <p>Inteligentny bot doradzający odpowiedni ubiór do pogody</p>
             </div>
+            <!-- Change API key button -->
+            <button
+                id="changeApiKeyBtn"
+                title="Zmień klucz API"
+                style="
+                    position: absolute; top: 1rem; right: 1rem;
+                    background: rgba(255,255,255,0.2); border: none; color: white;
+                    padding: 0.4rem 0.8rem; border-radius: 2rem; cursor: pointer;
+                    font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem;
+                    transition: background 0.2s;
+                "
+                onmouseover="this.style.background='rgba(255,255,255,0.35)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.2)'"
+            >
+                <i class="fas fa-key"></i> Klucz API
+            </button>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
             <div class="chat-container">
-                <!-- Chat Messages -->
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message bot-message">
-                        <div class="message-content">
-                            <p>Cześć! 👋 Jestem twoim asystentem stylu. Podaj mi nazwę miasta, a powiedzę ci jaki ubiór będzie idealny do dzisiejszej pogody!</p>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Weather Info Card -->
+                <!-- Chat Messages — JS populates this; no hardcoded message to avoid duplicates -->
+                <div class="chat-messages" id="chatMessages"></div>
+
+                <!-- Weather Info Card (shown when fetched from API) -->
                 <div class="weather-card" id="weatherCard" style="display: none;">
                     <div class="weather-header">
                         <h3 id="weatherCity"></h3>
@@ -59,34 +72,36 @@
 
                 <!-- Input Area -->
                 <div class="input-area">
-                    <form class="input-form" id="inputForm">
-                        <input 
-                            type="text" 
-                            id="userInput" 
-                            placeholder="Wpisz nazwę miasta..." 
+                    <form class="input-form" id="inputForm" novalidate>
+                        <input
+                            type="text"
+                            id="userInput"
+                            placeholder="Wpisz nazwę miasta lub opisz pogodę…"
                             autocomplete="off"
+                            aria-label="Wpisz nazwę miasta lub opis pogody"
+                            maxlength="100"
                         >
-                        <button type="submit" class="send-btn">
+                        <button type="submit" class="send-btn" aria-label="Wyślij">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </form>
                 </div>
 
                 <!-- Quick City Buttons -->
-                <div class="quick-buttons" id="quickButtons">
-                    <button class="quick-btn" data-city="Warszawa">Warszawa</button>
-                    <button class="quick-btn" data-city="Kraków">Kraków</button>
-                    <button class="quick-btn" data-city="Wrocław">Wrocław</button>
-                    <button class="quick-btn" data-city="Gdańsk">Gdańsk</button>
-                    <button class="quick-btn" data-city="Poznań">Poznań</button>
+                <div class="quick-buttons" id="quickButtons" role="group" aria-label="Szybki wybór miasta">
+                    <button class="quick-btn" data-city="Warszawa">🏙️ Warszawa</button>
+                    <button class="quick-btn" data-city="Kraków">🏰 Kraków</button>
+                    <button class="quick-btn" data-city="Wrocław">🌉 Wrocław</button>
+                    <button class="quick-btn" data-city="Gdańsk">⚓ Gdańsk</button>
+                    <button class="quick-btn" data-city="Poznań">🐐 Poznań</button>
                 </div>
             </div>
 
-            <!-- Sidebar - Chat History -->
-            <aside class="sidebar">
+            <!-- Sidebar — Chat History -->
+            <aside class="sidebar" aria-label="Historia wyszukiwań">
                 <div class="sidebar-header">
                     <h3><i class="fas fa-history"></i> Historia</h3>
-                    <button class="clear-history-btn" id="clearHistoryBtn">
+                    <button class="clear-history-btn" id="clearHistoryBtn" title="Wyczyść historię" aria-label="Wyczyść historię">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -96,12 +111,12 @@
     </div>
 
     <!-- Loading Spinner -->
-    <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+    <div class="loading-spinner" id="loadingSpinner" style="display: none;" role="status" aria-label="Ładowanie…">
         <div class="spinner"></div>
     </div>
 
     <!-- Error Toast -->
-    <div class="toast" id="errorToast"></div>
+    <div class="toast" id="errorToast" role="alert" aria-live="polite"></div>
 
     <script src="script.js"></script>
 </body>
