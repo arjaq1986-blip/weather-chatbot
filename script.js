@@ -420,7 +420,32 @@ function displayRecommendations(recommendations, weatherData) {
     clothingItems.innerHTML = '';
 
     let fullRecommendation = `💡 **Moje rekomendacje na ubiór:**\n\n`;
+        let conditionKey = "default";
+    if (weatherData.hasRain) conditionKey = "rain";
+    else if (weatherData.hasSnow) conditionKey = "snow";
+    else if (weatherData.hasWind) conditionKey = "wind";
+    else if (weatherData.isSunny) conditionKey = "sunny";
+    else if (weatherData.isCloudy) conditionKey = "cloudy";
 
+    switch (conditionKey) {
+        case "rain":
+            recommendations.advice += " ☔ Dodatkowa wskazówka: Unikaj dziś długich ubrań dotykających ziemi, aby ich nie przemoczyć.";
+            break;
+        case "snow":
+            recommendations.advice += " ❄️ Dodatkowa wskazówka: Śnieg odbija światło UV, w słoneczny zimowy dzień też przydadzą się okulary!";
+            break;
+        case "wind":
+            recommendations.advice += " 💨 Dodatkowa wskazówka: Zwiąż włosy i zrezygnuj z luźnych kapeluszy, które wiatr może łatwo porwać.";
+            break;
+        case "sunny":
+            recommendations.advice += " 🕶️ Dodatkowa wskazówka: Idealny moment na jasne kolory (np. biel), które odbijają ciepło i chłodzą organizm.";
+            break;
+        case "cloudy":
+            recommendations.advice += " ☁️ Dodatkowa wskazówka: Pochmurna pogoda kocha kontrasty. Przełam szarość dnia jednym jaskrawym akcentem!";
+            break;
+        default:
+            recommendations.advice += " 👗 Dodatkowa wskazówka: Ubierz się przede wszystkim tak, abyś czuł się swobodnie i komfortowo.";
+    }
     if (recommendations.clothing.length > 0) {
         fullRecommendation += `👕 **Ubranie:**\n${recommendations.clothing.map(item => `• ${item}`).join('\n')}\n\n`;
     }
