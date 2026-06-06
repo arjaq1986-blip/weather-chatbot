@@ -100,21 +100,17 @@ npx http-server
 
 ## ⚙️ Konfiguracja
 
+## ⚙️ Konfiguracja
+
 ### OpenWeather API Key
 
 1. Przejdź na [OpenWeatherMap](https://openweathermap.org/api)
-2. Zarejestruj bezpłatne konto
-3. Skopiuj swój API Key
-4. Otwórz plik `script.js`
-5. Znajdź linię 6:
-```javascript
-const OPENWEATHER_API_KEY = 'YOUR_API_KEY_HERE';
-```
-6. Zastąp `'YOUR_API_KEY_HERE'` swoim kluczem:
-```javascript
-const OPENWEATHER_API_KEY = 'abc123def456xyz789';
-```
-7. Zapisz plik
+2. Zarejestruj bezpłatne konto i skopiuj swój klucz API
+3. Otwórz aplikację w przeglądarce — przy pierwszym uruchomieniu automatycznie pojawi się panel logowania
+4. Wklej klucz API i kliknij **"Zapisz i połącz"**
+5. Klucz zostanie zapisany w localStorage przeglądarki i będzie używany przy każdym kolejnym uruchomieniu
+
+> Nie masz jeszcze klucza? Kliknij **"Użyj bez API"** — aplikacja działa też bez niego (opisujesz pogodę słowami).
 
 ## 🎮 Użytkowanie
 
