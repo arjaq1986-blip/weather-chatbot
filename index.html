@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Doradzający Ubiór do Pogody</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-cloud-sun"></i> Asystent Stylu Pogodowego</h1>
+                <p>Inteligentny bot doradzający odpowiedni ubiór do pogody</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="chat-container">
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <p>Cześć! 👋 Jestem twoim asystentem stylu. Podaj mi nazwę miasta, a powiedzę ci jaki ubiór będzie idealny do dzisiejszej pogody!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Info Card -->
+                <div class="weather-card" id="weatherCard" style="display: none;">
+                    <div class="weather-header">
+                        <h3 id="weatherCity"></h3>
+                        <span id="weatherTemp"></span>
+                    </div>
+                    <div class="weather-details">
+                        <div class="weather-item">
+                            <i class="fas fa-cloud"></i>
+                            <span id="weatherDesc"></span>
+                        </div>
+                        <div class="weather-item">
+                            <i class="fas fa-droplet"></i>
+                            <span id="weatherHumidity"></span>
+                        </div>
+                        <div class="weather-item">
+                            <i class="fas fa-wind"></i>
+                            <span id="weatherWind"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clothing Recommendations Card -->
+                <div class="recommendations-card" id="recommendationsCard" style="display: none;">
+                    <h3><i class="fas fa-shirt"></i> Rekomendacje garderoby:</h3>
+                    <div class="clothing-items" id="clothingItems"></div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area">
+                    <form class="input-form" id="inputForm">
+                        <input 
+                            type="text" 
+                            id="userInput" 
+                            placeholder="Wpisz nazwę miasta..." 
+                            autocomplete="off"
+                        >
+                        <button type="submit" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Quick City Buttons -->
+                <div class="quick-buttons" id="quickButtons">
+                    <button class="quick-btn" data-city="Warszawa">Warszawa</button>
+                    <button class="quick-btn" data-city="Kraków">Kraków</button>
+                    <button class="quick-btn" data-city="Wrocław">Wrocław</button>
+                    <button class="quick-btn" data-city="Gdańsk">Gdańsk</button>
+                    <button class="quick-btn" data-city="Poznań">Poznań</button>
+                </div>
+            </div>
+
+            <!-- Sidebar - Chat History -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-history"></i> Historia</h3>
+                    <button class="clear-history-btn" id="clearHistoryBtn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="history-list" id="historyList"></div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Error Toast -->
+    <div class="toast" id="errorToast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
