@@ -5,12 +5,13 @@
 /**
  * API Configuration
  * Note: API Key should be set via environment variable or backend proxy
- * For development, use a backend server to hide the API key
+ * For production, use a backend server to hide the API key
  */
 export const CONFIG = {
     API: {
-        // Use backend proxy instead of direct API calls
-        BASE_URL: '/api/weather', // Backend endpoint
+        // Use backend proxy or environment variable
+        BASE_URL: '/api/weather',
+        DIRECT_URL: 'https://api.openweathermap.org/data/2.5/weather',
         TIMEOUT: 5000,
         RETRY_ATTEMPTS: 3
     },
@@ -61,13 +62,55 @@ export const WEATHER_PATTERNS = {
 };
 
 /**
+ * Clothing recommendations by temperature ranges
+ */
+export const CLOTHING_DATABASE = {
+    veryHot: {
+        temp: 30,
+        clothing: ['Lekki T-shirt', 'Krótkie szorty', 'Sandały'],
+        accessories: ['Kapelusz', 'Okulary słoneczne', 'Lekki szalik'],
+        protection: ['Krem z SPF 50+', 'Butelka wody'],
+        style: ['Minimalistyczne', 'Sportowe', 'Casual']
+    },
+    hot: {
+        temp: 25,
+        clothing: ['T-shirt', 'Krótkie spodnie', 'Trampki lub sandały'],
+        accessories: ['Okulary słoneczne', 'Czapka baseballowa', 'Lekki szalik'],
+        protection: ['Krem SPF 30+', 'Parasol'],
+        style: ['Casual', 'Sportowe', 'Swobodne']
+    },
+    moderate: {
+        temp: 15,
+        clothing: ['Koszula', 'Jeansy', 'Sneakersy'],
+        accessories: ['Lekka kurtka', 'Czapka', 'Szalik'],
+        protection: ['Krem SPF 15+'],
+        style: ['Eleganckie casual', 'Streetwear', 'Biznesowe']
+    },
+    cold: {
+        temp: 5,
+        clothing: ['Gruby sweter', 'Spodnie', 'Trapery'],
+        accessories: ['Zimowa kurtka', 'Czapka zimowa', 'Szalik wełniany', 'Rękawiczki'],
+        protection: ['Balsam do ust', 'Warstwowanie'],
+        style: ['Ciepłe', 'Zimowe', 'Wygodne']
+    },
+    veryCold: {
+        temp: 0,
+        clothing: ['Długa termodzianka', 'Grube spodnie zimowe', 'Buty zimowe'],
+        accessories: ['Parka', 'Czapka z futerkiem', 'Szal', 'Rękawiczki', 'Szalik'],
+        protection: ['Warstwowanie ubrań', 'Krem na zmianę temperatury', 'Termalne skarpety'],
+        style: ['Izolacyjne', 'Ciężkie', 'Ochronne']
+    }
+};
+
+/**
  * Error messages
  */
 export const ERROR_MESSAGES = {
     API_ERROR: 'Nie udało się pobrać danych pogodowych. Sprawdź nazwę miasta.',
     NETWORK_ERROR: 'Problem z połączeniem internetowym.',
     INVALID_INPUT: 'Proszę wpisz ważne dane o pogodzie lub nazwę miasta.',
-    UNKNOWN_ERROR: 'Nieznany błąd. Spróbuj jeszcze raz.'
+    UNKNOWN_ERROR: 'Nieznany błąd. Spróbuj jeszcze raz.',
+    INVALID_TEMP: 'Nie mogę zidentyfikować temperatury. Spróbuj: "Jest 15 stopni i pada deszcz"'
 };
 
 /**
