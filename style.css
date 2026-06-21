@@ -680,3 +680,63 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+/* ============================================================
+   ETAP 7: STYLE DLA TRYBU CIEMNEGO (DARK MODE)
+   ============================================================ */
+body.dark {
+    --bg-light: #0f172a;        /* ciemny slate */
+    --bg-white: #1e293b;        /* jaśniejszy slate na karty */
+    --text-dark: #f1f5f9;       /* jasny tekst */
+    --text-gray: #94a3b8;       /* szary tekst pomocniczy */
+    --border-color: #334155;    /* ciemniejsze ramki */
+}
+
+/* Dostosowanie elementów, które wymagają poprawek kontrastu w trybie ciemnym */
+body.dark .message.bot-message {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+body.dark .sidebar, 
+body.dark .chat-container,
+body.dark .card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark .history-item:hover {
+    background: #334155;
+}
+
+body.dark #userInput {
+    background: #0f172a;
+    color: #f1f5f9;
+    border-color: #334155;
+}
+
+/* ============================================================
+   ETAP 7: ANIMACJA PISANIA BOTA (TYPING ANIMATION)
+   ============================================================ */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: var(--text-gray);
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounceDots 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounceDots {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
