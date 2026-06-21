@@ -21,7 +21,7 @@
             <button 
                 id="darkModeToggle" 
                 title="Przełącz tryb" 
-                style="position: absolute; top: 1rem; left: 1rem; background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.4rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.85rem;"
+                style="position: absolute; top: 1rem; left: 1rem; background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.4rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; transition: background 0.2s;"
                 aria-label="Przełącz tryb ciemny lub jasny">
                 <i class="fas fa-moon"></i> Tryb
             </button>
@@ -125,6 +125,16 @@
     <!-- Error Toast -->
     <div class="toast" id="errorToast" role="alert" aria-live="polite"></div>
 
-    <script src="script.js"></script>
+    <!-- Modular JavaScript Files -->
+    <script type="module">
+        import { CONFIG, QUICK_CITIES, WEATHER_PATTERNS, ERROR_MESSAGES, SUCCESS_MESSAGES } from './js/config.js';
+        import { fetchWeatherData, analyzeWeather, generateRecommendations } from './js/api.js';
+        import { saveToHistory, getHistory, clearHistory } from './js/storage.js';
+        import { renderMessage, displayWeatherCard, displayRecommendations, showError, showSuccess, toggleDarkMode, createApiKeyPanel, updateQuickButtons } from './js/ui.js';
+        import { initializeApp, handleUserInput, setupEventListeners } from './js/main.js';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
 </body>
 </html>
