@@ -31,7 +31,7 @@ export class AdminSettings {
             maintenanceMode: false,
             maintenanceMessage: 'Aplikacja jest w trybie konserwacji. Spróbuj później.',
             defaultLanguage: 'pl',
-            cacheDuration: 3600000, // 1 hour
+            cacheDuration: 3600000,
             enableFeatures: {
                 darkMode: true,
                 history: true,
