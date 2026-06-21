@@ -5,6 +5,7 @@ const API_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const LOCALSTORAGE_KEY = 'weatherChatHistory';
 const LOCALSTORAGE_API_KEY = 'weatherApiKey';
 const MAX_HISTORY = 20;
+const LOCALSTORAGE_DARK_MODE = 'weatherChatDarkMode'; // Klucz dla zapisu trybu ciemnego
 
 // ===========================
 // DOM ELEMENTS
@@ -200,7 +201,12 @@ const clothingRecommendations = {
 document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
     loadChatHistory();
-
+    // Inicjalizacja trybu ciemnego z LocalStorage (Etap 7)
+    if (localStorage.getItem(LOCALSTORAGE_DARK_MODE) === 'enabled') {
+        document.body.classList.add('dark');
+        const toggleBtn = document.getElementById('darkModeToggle');
+        if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-sun"></i> Tryb';
+    }
     // Show API key panel on first visit (no key stored yet)
     if (!getApiKey()) {
         createApiKeyPanel();
@@ -226,6 +232,21 @@ function initializeEventListeners() {
     const changeKeyBtn = document.getElementById('changeApiKeyBtn');
     if (changeKeyBtn) {
         changeKeyBtn.addEventListener('click', createApiKeyPanel);
+    }
+    // Obsługa przełączania trybu ciemnego (Etap 7)
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            
+            if (document.body.classList.contains('dark')) {
+                localStorage.setItem(LOCALSTORAGE_DARK_MODE, 'enabled');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Tryb';
+            } else {
+                localStorage.setItem(LOCALSTORAGE_DARK_MODE, 'disabled');
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> Tryb';
+            }
+        });
     }
 }
 
@@ -332,11 +353,18 @@ function handleUserInput(e) {
 
     const weatherData = parseWeatherInput(input);
 
-    if (weatherData.temperature === null && !weatherData.hasRain && !weatherData.hasSnow) {
-        handleWeatherRequest(input);
-    } else {
-        processWeatherDescription(weatherData);
-    }
+    // Pokazujemy animację pisania bota (Etap 7)
+    showTypingIndicator();
+
+    setTimeout(() => {
+        removeTypingIndicator(); // Usuwamy kropki tuż przed pokazaniem wiadomości
+
+        if (weatherData.temperature === null && !weatherData.hasRain && !weatherData.hasSnow) {
+            handleWeatherRequest(input);
+        } else {
+            processWeatherDescription(weatherData);
+        }
+    }, 1000); // 1000 ms = 1 sekunda symulacji pisania
 }
 
 function handleWeatherRequest(city) {
@@ -519,7 +547,33 @@ function showLoading() {
 function hideLoading() {
     loadingSpinner.style.display = 'none';
 }
+// ===========================
+// ETAP 7: TYPING ANIMATION LOGIC
+// ===========================
+let typingIndicatorElem = null;
 
+function showTypingIndicator() {
+    if (typingIndicatorElem) return; // Jeśli już pisze, nie dodawaj drugiego
+
+    typingIndicatorElem = document.createElement('div');
+    typingIndicatorElem.className = 'message bot-message typing-container';
+    typingIndicatorElem.innerHTML = `
+        <div class="message-content">
+            <div class="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    `;
+    chatMessages.appendChild(typingIndicatorElem);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll automatyczny
+}
+
+function removeTypingIndicator() {
+    if (typingIndicatorElem) {
+        typingIndicatorElem.remove();
+        typingIndicatorElem = null;
+    }
+}
 // ===========================
 // CHAT HISTORY
 // ===========================
