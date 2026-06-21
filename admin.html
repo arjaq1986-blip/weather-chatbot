@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel administracyjny - zarządzanie aplikacją Bot Doradzający Ubiór do Pogody">
+    <meta name="theme-color" content="#6366f1">
+    <title>Panel Administracyjny - Bot Doradzający Ubiór do Pogody</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .admin-sidebar h2 {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .admin-sidebar ul {
+            list-style: none;
+        }
+
+        .admin-sidebar li {
+            margin: 0.5rem 0;
+        }
+
+        .admin-sidebar a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .admin-content {
+            margin-left: 250px;
+            flex: 1;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h1 {
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        .admin-logout {
+            padding: 0.75rem 1.5rem;
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .admin-logout:hover {
+            background: #a93226;
+        }
+
+        .admin-main {
+            padding: 2rem;
+            overflow-y: auto;
+            height: calc(100vh - 80px);
+        }
+
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .admin-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #a93226;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .feature-toggle {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            color: #1565c0;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            color: #e65100;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #c62828;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1rem 0;
+            }
+
+            .admin-content {
+                margin-left: 0;
+            }
+
+            .admin-main {
+                height: auto;
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <h2>⚙️ Admin Panel</h2>
+            <ul>
+                <li><a href="#dashboard" class="admin-link active" data-section="dashboard">📊 Pulpit</a></li>
+                <li><a href="#settings" class="admin-link" data-section="settings">⚙️ Ustawienia</a></li>
+                <li><a href="#features" class="admin-link" data-section="features">✨ Funkcje</a></li>
+                <li><a href="#analytics" class="admin-link" data-section="analytics">📈 Analityka</a></li>
+                <li><a href="#maintenance" class="admin-link" data-section="maintenance">🔧 Konserwacja</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="admin-content">
+            <!-- Header -->
+            <header class="admin-header">
+                <h1>Panel Administracyjny</h1>
+                <button class="admin-logout" id="logoutBtn">Wyloguj się</button>
+            </header>
+
+            <!-- Content Area -->
+            <main class="admin-main">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="admin-section">
+                    <h2>📊 Pulpit Nawigacyjny</h2>
+                    <div class="alert alert-info">
+                        ℹ️ Tutaj możesz zobaczyć przegląd statystyk i wydajności aplikacji.
+                    </div>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Stats will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="admin-section" style="display: none;">
+                    <h2>⚙️ Ustawienia Aplikacji</h2>
+                    <div class="alert alert-info">
+                        ℹ️ Zmień ogólne ustawienia aplikacji.
+                    </div>
+                    <form id="settingsForm">
+                        <div class="form-group">
+                            <label>Nazwa aplikacji</label>
+                            <input type="text" id="appName" placeholder="Nazwa aplikacji" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Wersja</label>
+                            <input type="text" id="appVersion" placeholder="Wersja" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Limit historii</label>
+                            <input type="number" id="maxHistory" placeholder="Liczba elementów" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Timeout API (ms)</label>
+                            <input type="number" id="apiTimeout" placeholder="Timeout w ms" min="1000" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">💾 Zapisz ustawienia</button>
+                            <button type="reset" class="btn btn-secondary">🔄 Resetuj</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Features Section -->
+                <section id="features" class="admin-section" style="display: none;">
+                    <h2>✨ Zarządzaj Funkcjami</h2>
+                    <div class="alert alert-info">
+                        ℹ️ Włącz lub wyłącz funkcje aplikacji.
+                    </div>
+                    <ul class="feature-list" id="featuresList">
+                        <!-- Features will be loaded here -->
+                    </ul>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analytics" class="admin-section" style="display: none;">
+                    <h2>📈 Analityka</h2>
+                    <div class="alert alert-info">
+                        ℹ️ Przeglądaj szczegółowe statystyki użytkowników.
+                    </div>
+                    <div id="analyticsContent">
+                        <!-- Analytics will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Maintenance Section -->
+                <section id="maintenance" class="admin-section" style="display: none;">
+                    <h2>🔧 Konserwacja</h2>
+                    <div class="alert alert-warning">
+                        ⚠️ Funkcje konserwacji wpływają na działanie aplikacji. Używaj ostrożnie!
+                    </div>
+
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #333;">Tryb Konserwacji</h3>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="maintenanceMode" style="width: auto; margin-right: 0.5rem;">
+                            Włącz tryb konserwacji
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>Wiadomość konserwacji</label>
+                        <textarea id="maintenanceMsg" placeholder="Wiadomość dla użytkowników" rows="4"></textarea>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #333;">Zarządzanie Danymi</h3>
+                    <div class="button-group">
+                        <button class="btn btn-success" id="exportStatsBtn">📥 Eksportuj statystyki</button>
+                        <button class="btn btn-danger" id="resetStatsBtn">🗑️ Resetuj statystyki</button>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #333;">Zaawansowane</h3>
+                    <div class="button-group">
+                        <button class="btn btn-danger" id="clearCacheBtn">🗑️ Wyczyść cache</button>
+                        <button class="btn btn-secondary" id="checkHealthBtn">🏥 Sprawdź zdrowie aplikacji</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Admin Panel Script -->
+    <script type="module">
+        import AdminUI from './js/admin-ui.js';
+        import AdminAuth from './js/admin-auth.js';
+
+        let adminUI = null;
+        const auth = new AdminAuth();
+
+        // Check if user is authenticated
+        if (!auth.isAuthenticated()) {
+            // Show login panel
+            adminUI = new AdminUI();
+            adminUI.showLoginPanel();
+        } else {
+            // Show admin panel
+            adminUI = new AdminUI();
+            adminUI.showAdminPanel();
+        }
+
+        // Tab switching
+        document.querySelectorAll('.admin-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.dataset.section;
+
+                // Hide all sections
+                document.querySelectorAll('.admin-section').forEach(sec => {
+                    sec.style.display = 'none';
+                });
+
+                // Show selected section
+                document.getElementById(section).style.display = 'block';
+
+                // Update active link
+                document.querySelectorAll('.admin-link').forEach(l => {
+                    l.classList.remove('active');
+                });
+                e.target.classList.add('active');
+            });
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.logout();
+            alert('Wylogowano pomyślnie');
+            location.reload();
+        });
+
+        // Load admin data
+        function loadAdminData() {
+            const settings = adminUI.settings.getAllSettings();
+            const dashboard = adminUI.analytics.getDashboardData();
+
+            // Load stats
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = dashboard.cards.map(card => `
+                <div class="stat-card" style="border-left: 4px solid ${card.color};">
+                    <h3>${card.title}</h3>
+                    <div class="value">${card.value}</div>
+                </div>
+            `).join('');
+
+            // Load settings form
+            document.getElementById('appName').value = settings.appName;
+            document.getElementById('appVersion').value = settings.appVersion;
+            document.getElementById('maxHistory').value = settings.maxHistoryItems;
+            document.getElementById('apiTimeout').value = settings.apiTimeout;
+
+            // Load features
+            const featuresList = document.getElementById('featuresList');
+            const featureLabels = {
+                darkMode: 'Tryb ciemny',
+                history: 'Historia zapytań',
+                quickButtons: 'Przyciski miast',
+                recommendations: 'Rekomendacje ubioru',
+                offline: 'Tryb offline'
+            };
+
+            featuresList.innerHTML = Object.entries(settings.enableFeatures).map(([key, value]) => `
+                <li class="feature-item">
+                    <span>${featureLabels[key]}</span>
+                    <input type="checkbox" class="feature-toggle" data-feature="${key}" ${value ? 'checked' : ''}>
+                </li>
+            `).join('');
+
+            // Load maintenance settings
+            document.getElementById('maintenanceMode').checked = settings.maintenanceMode;
+            document.getElementById('maintenanceMsg').value = settings.maintenanceMessage;
+
+            // Load analytics
+            const analyticsContent = document.getElementById('analyticsContent');
+            analyticsContent.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div style="padding: 1rem; background: #f5f5f5; border-radius: 8px;">
+                        <strong>Najczęściej przeszukiwane miasto:</strong>
+                        <p style="margin: 0.5rem 0; font-size: 1.2rem; color: #667eea;">${dashboard.topCity}</p>
+                    </div>
+                    <div style="padding: 1rem; background: #f5f5f5; border-radius: 8px;">
+                        <strong>Najczęstsza pogoda:</strong>
+                        <p style="margin: 0.5rem 0; font-size: 1.2rem; color: #667eea;">${dashboard.mostCommonWeather}</p>
+                    </div>
+                    <div style="padding: 1rem; background: #f5f5f5; border-radius: 8px;">
+                        <strong>Średni czas odpowiedzi:</strong>
+                        <p style="margin: 0.5rem 0; font-size: 1.2rem; color: #667eea;">${dashboard.avgResponseTime}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Event listeners
+        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            adminUI.settings.updateSetting('appName', document.getElementById('appName').value);
+            adminUI.settings.updateSetting('maxHistoryItems', parseInt(document.getElementById('maxHistory').value));
+            adminUI.settings.updateSetting('apiTimeout', parseInt(document.getElementById('apiTimeout').value));
+            alert('Ustawienia zapisane pomyślnie');
+        });
+
+        document.querySelectorAll('.feature-toggle').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                adminUI.settings.toggleFeature(e.target.dataset.feature);
+            });
+        });
+
+        document.getElementById('maintenanceMode').addEventListener('change', (e) => {
+            adminUI.settings.setMaintenanceMode(e.target.checked);
+        });
+
+        document.getElementById('exportStatsBtn').addEventListener('click', () => {
+            const stats = adminUI.analytics.exportStats();
+            const blob = new Blob([stats], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'statistics.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('resetStatsBtn').addEventListener('click', () => {
+            if (confirm('Czy na pewno chcesz zresetować wszystkie statystyki?')) {
+                adminUI.analytics.resetStats();
+                alert('Statystyki zostały zresetowane');
+                loadAdminData();
+            }
+        });
+
+        document.getElementById('clearCacheBtn').addEventListener('click', () => {
+            if (confirm('Czy na pewno chcesz wyczyścić cache?')) {
+                localStorage.clear();
+                alert('Cache został wyczyszczony');
+            }
+        });
+
+        document.getElementById('checkHealthBtn').addEventListener('click', () => {
+            const health = {
+                status: 'OK',
+                timestamp: new Date(),
+                uptime: Math.floor(performance.now() / 1000),
+                cacheSize: new Blob(Object.values(localStorage)).size,
+                features: adminUI.settings.getAllSettings().enableFeatures
+            };
+            alert('Status aplikacji: ' + JSON.stringify(health, null, 2));
+        });
+
+        // Initial load
+        loadAdminData();
+    </script>
+</body>
+</html>
